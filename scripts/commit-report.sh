@@ -84,10 +84,16 @@ BASENAME="$(basename "$FILE" .md)"
 #   1) 去掉开头的 # 与空白
 #   2) 用常见分隔符 ·、•、|、｜ 截断，只保留第一段
 #   3) 去掉尾部空白
-TITLE_LINE="$(head -n 1 "$FILE" | sed -E 's/^#+[[:space:]]*//')"
-SUBJECT="$(printf '%s' "$TITLE_LINE" \
-    | sed -E 's/[·•|｜].*//' \
-    | sed -E 's/[[:space:]]+$//')"
+# 注：macOS 自带 BSD sed 对多字节字符不友好，这里用 perl -CSD 保证 UTF-8 安全。
+SUBJECT="$(perl -CSD -ne '
+    if ($. == 1) {
+        s/^\#+\s*//;
+        s/\s*[·•|｜].*//;
+        s/\s+$//;
+        print;
+        exit;
+    }
+' "$FILE")"
 SUBJECT="${SUBJECT:-${TYPE} 报告}"
 
 MESSAGE="docs(${TYPE}): ${BASENAME} ${SUBJECT}"
