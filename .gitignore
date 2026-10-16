@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# CodeBuddy 工作目录（本地状态，勿推远端）
+.codebuddy/
+
 # 编辑器 / IDE
 .idea/
 .vscode/
